@@ -32,39 +32,16 @@ class papertrail (
     notify => Service['rsyslog'],
   }
 
-  if ! defined(Package["gcc"]) {
-    package { 'gcc':
-      ensure => present,
-    }
-  }
-
-  if ! defined(Package["rubygems"]) {
-    package { 'rubygems':
-      ensure => present,
-    }
-  }
-  
-  if ! defined(Package["libssl-dev"]) {
-    package { 'libssl-dev':
-      ensure => present,
-    }  
-  }
-  
-
-  package { 'remote_syslog':
-    ensure   => present,
-    provider => 'gem',
-    require  => [
-      Package['rubygems'],
-      Package['gcc'],
-      Package['libssl-dev'],
-    ],
-  }
-
   file { 'remote_syslog upstart script':
     ensure => file,
     source => 'puppet:///modules/papertrail/remote_syslog.upstart.conf',
     path   => '/etc/init/remote_syslog.conf',
+  }
+
+  file { 'remote_syslog binary':
+    ensure => file,
+    source => 'puppet:///modules/papertrail/remote_syslog-0.16-i386',
+    path   => '/usr/local/bin/remote_syslog',
   }
 
   $remote_syslog_status = empty($extra_logs) ? {
