@@ -26,4 +26,9 @@ class papertrail::systemd {
     provider    => 'systemd',
     require     => Package['remote_syslog'],
   }
+
+  service { 'rsyslog':
+    ensure => running,
+    provider => 'systemd'
+  }
 }

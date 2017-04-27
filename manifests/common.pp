@@ -14,13 +14,9 @@ class papertrail::common {
     false  => file
   }
 
-  service { 'rsyslog':
-    ensure => running,
-  }
-
   file { 'rsyslog config':
     ensure   => file,
-    content  => template($template),
+    content  => template('papertrail/rsyslog.conf.erb'),
     path     => '/etc/rsyslog.d/99-papertrail.conf',
     notify   => Service['rsyslog'],
   }

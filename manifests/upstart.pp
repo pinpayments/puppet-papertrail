@@ -7,6 +7,10 @@ class papertrail::upstart {
     notify  => Service['remote_syslog'],
   }
 
+  service { 'rsyslog':
+    ensure => running,
+  }
+
   file { 'remote_syslog binary':
     ensure => file,
     source => 'puppet:///modules/papertrail/remote_syslog-0.16-i386',

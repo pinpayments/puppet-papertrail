@@ -11,7 +11,7 @@ class papertrail (
 ) {
   include papertrail::common
 
-  case $facts['os']['release']['major'] {
+  case $::os['release']['major'] {
     /^(1[6-9]|2\d)\.\d\d$/: { include papertrail::systemd }
     default: { include papertrail::upstart }
   }
