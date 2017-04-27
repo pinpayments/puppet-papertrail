@@ -9,6 +9,17 @@ class papertrail (
   $extra_logs             = [],
   $template               = 'papertrail/rsyslog.conf.erb',
 ) {
+
+  $remote_syslog_status = empty($extra_logs) ? {
+    true => stopped,
+    false  => running
+  }
+
+  $remote_syslog_file = empty($extra_logs) ? {
+    true => absent,
+    false  => file
+  }
+
   include papertrail::common
 
   case $::os['release']['major'] {

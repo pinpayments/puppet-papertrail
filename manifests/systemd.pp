@@ -22,7 +22,7 @@ class papertrail::systemd {
   }
 
   service { 'remote_syslog':
-    ensure      => $remote_syslog_status,
+    ensure      => running,
     provider    => 'systemd',
     require     => Package['remote_syslog'],
   }

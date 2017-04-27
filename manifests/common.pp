@@ -4,16 +4,6 @@ class papertrail::common {
     notify => Service['rsyslog'],
   }
 
-  $remote_syslog_status = empty($extra_logs) ? {
-    true => stopped,
-    false  => running
-  }
-
-  $remote_syslog_file = empty($extra_logs) ? {
-    true => absent,
-    false  => file
-  }
-
   file { 'rsyslog config':
     ensure   => file,
     content  => template('papertrail/rsyslog.conf.erb'),
