@@ -9,62 +9,10 @@ class papertrail (
   $extra_logs             = [],
   $template               = 'papertrail/rsyslog.conf.erb',
 ) {
-  file { 'rsyslog config':
-    ensure   => file,
-    content  => template($template),
-    path     => '/etc/rsyslog.d/99-papertrail.conf',
-    notify   => Service['rsyslog'],
-  }
+  include papertrail::common
 
-  package { 'rsyslog-gnutls':
-    ensure => installed,
-    notify => Service['rsyslog'],
-  }
-
-  service { 'rsyslog':
-    ensure => running,
-  }
-
-  file { 'papertrail certificate':
-    ensure => file,
-    source => $papertrail_certificate,
-    path   => '/etc/papertrail.crt',
-    notify => Service['rsyslog'],
-  }
-
-  file { 'remote_syslog upstart script':
-    ensure => file,
-    source => 'puppet:///modules/papertrail/remote_syslog.upstart.conf',
-    path   => '/etc/init/remote_syslog.conf',
-  }
-
-  file { 'remote_syslog binary':
-    ensure => file,
-    source => 'puppet:///modules/papertrail/remote_syslog-0.16-i386',
-    path   => '/usr/local/bin/remote_syslog',
-  }
-
-  $remote_syslog_status = empty($extra_logs) ? {
-    true => stopped,
-    false  => running
-  }
-
-  $remote_syslog_file = empty($extra_logs) ? {
-    true => absent,
-    false  => file
-  }
-
-  file { 'remote_syslog config':
-    ensure  => $remote_syslog_file,
-    content => template('papertrail/log_files.yml.erb'),
-    path    => '/etc/log_files.yml',
-    require => File['remote_syslog upstart script'],
-    notify  => Service['remote_syslog'],
-  }
-
-  service { 'remote_syslog':
-    ensure      => $remote_syslog_status,
-    provider    => 'upstart',
-    require     => File['remote_syslog upstart script'],
+  case $facts['os']['release']['major'] {
+    /^(1[6-9]|2\d)\.\d\d$/: { include papertrail::systemd }
+    default: { include papertrail::upstart }
   }
 }
